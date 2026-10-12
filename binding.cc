@@ -304,6 +304,8 @@ NAN_METHOD(tcpflush){
 }
 
 NAN_METHOD(tcprecv){
+  if (!node::Buffer::HasInstance(info[0]))
+    return Nan::ThrowTypeError("the socket argument must be a socket handle");
   /* deadline */
   int64_t deadline = -1;
   if (info[2]->IsNumber())
@@ -324,6 +326,8 @@ NAN_METHOD(tcprecv){
 
 //TODO: delimiters: const char *delims, size_t delimcount
 NAN_METHOD(tcprecvuntil){
+  if (!node::Buffer::HasInstance(info[0]))
+    return Nan::ThrowTypeError("the socket argument must be a socket handle");
   /* deadline */
   int64_t deadline = -1;
   if (info[2]->IsNumber())
@@ -413,6 +417,8 @@ NAN_METHOD(udpsend){
 }
 
 NAN_METHOD(udprecv){
+  if (!node::Buffer::HasInstance(info[0]))
+    return Nan::ThrowTypeError("the socket argument must be a socket handle");
   ipaddr addr;
   int len = To<int>(info[1]).FromJust();
   if (len <= 0 || len > MAX_RECV_BUF)
@@ -529,6 +535,8 @@ NAN_METHOD(unixflush){
 
 //TODO: deadline
 NAN_METHOD(unixrecv){
+  if (!node::Buffer::HasInstance(info[0]))
+    return Nan::ThrowTypeError("the socket argument must be a socket handle");
   int rcvbuf = To<int>(info[1]).FromJust();
 
   /* should make it a static char */
@@ -543,6 +551,8 @@ NAN_METHOD(unixrecv){
 
 //TODO: deadline
 NAN_METHOD(unixrecvuntil){
+  if (!node::Buffer::HasInstance(info[0]))
+    return Nan::ThrowTypeError("the socket argument must be a socket handle");
   int rcvbuf = To<int>(info[1]).FromJust();
   unixsock s = UnwrapPointer<unixsock>(info[0]);
 
