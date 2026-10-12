@@ -43,6 +43,9 @@ using Nan::Set;
 using Nan::New;
 using Nan::To;
 
+/* The receive buffers below live on the stack, so cap what callers may ask for. */
+#define MAX_RECV_BUF (1024 * 1024)
+
 extern "C" {
 #include "libmill.h"
 }
@@ -307,6 +310,8 @@ NAN_METHOD(tcprecv){
     deadline = now() + To<int64_t>(info[2]).FromJust();
 
   int rcvbuf = To<int>(info[1]).FromJust();
+  if (rcvbuf <= 0 || rcvbuf > MAX_RECV_BUF)
+    return Nan::ThrowRangeError("receive buffer size must be between 1 and 1048576");
 
   char buf[rcvbuf];
   size_t sz = tcprecv(UnwrapPointer<tcpsock>(info[0]), buf, rcvbuf, deadline);
@@ -326,6 +331,9 @@ NAN_METHOD(tcprecvuntil){
 
   /* recv buffer size */
   int rcvbuf = To<int>(info[1]).FromJust();
+  if (rcvbuf <= 0 || rcvbuf > MAX_RECV_BUF)
+    return Nan::ThrowRangeError("receive buffer size must be between 1 and 1048576");
+  
   char buf[rcvbuf];
 
   /* recvuntil delimiters */
@@ -407,6 +415,8 @@ NAN_METHOD(udpsend){
 NAN_METHOD(udprecv){
   ipaddr addr;
   int len = To<int>(info[1]).FromJust();
+  if (len <= 0 || len > MAX_RECV_BUF)
+    return Nan::ThrowRangeError("receive buffer size must be between 1 and 1048576");
   udpsock s = UnwrapPointer<udpsock>(info[0]);
 
   if (info[2]->IsFunction()) {
